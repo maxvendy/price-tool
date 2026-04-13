@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vad är din telefon värd?</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F7F6F3;
+  --surface: #FFFFFF;
+  --surface2: #F0EFEB;
+  --border: #E2E0DA;
+  --border-strong: #C8C5BC;
+  --text: #1A1916;
+  --text-muted: #7A7870;
+  --accent: #210212;
+  --orange: #FF8E62;
+  --red: #9B2335;
+  --red-bg: #FCE4E8;
+  --amber: #7D5A00;
+  --amber-bg: #FFF3CD;
+  --green: #2D6A4F;
+  --green-bg: #D8F3DC;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Be Vietnam Pro', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+html { scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+.outer { max-width: 980px; margin: 0 auto; padding: 36px 24px 80px; display: flex; gap: 32px; align-items: flex-start; }
+.sticky-price-col { width: 260px; flex-shrink: 0; position: sticky; top: 72px; }
+.form-col { flex: 1; min-width: 0; }
+.page { }
+
+
+/* Sticky top bar (mobile) */
+.sticky-top-bar { background: var(--bg); }
+
+/* Header */
+.header { margin-bottom: 20px; }
+.header-eyebrow { font-family: 'Be Vietnam Pro', sans-serif; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; }
+.header h1 { font-size: clamp(26px, 5vw, 38px); font-weight: 600; line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 10px; }
+
+/* Top disclaimer */
+.top-disclaimer {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--orange);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 28px;
+}
+.top-disclaimer strong { color: var(--text); font-weight: 500; }
+
+
+
+/* Cards */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; margin-bottom: 10px; box-shadow: var(--shadow); transition: border-color .2s, opacity .2s; }
+.card.active { border-color: var(--border-strong); }
+.card.done { background: var(--surface2); box-shadow: none; opacity: .8; }
+.step-meta { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 14px; }
+.step-num { font-family: 'Be Vietnam Pro', sans-serif; font-size: 11px; font-weight: 500; color: var(--text-muted); background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 3px 10px; letter-spacing: .05em; white-space: nowrap; flex-shrink: 0; margin-top: 2px; }
+.card.active .step-num { background: var(--orange); color: #fff; border-color: var(--orange); }
+.step-title { font-size: 15px; font-weight: 500; color: var(--text); line-height: 1.4; }
+.step-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 3px; font-weight: 400; }
+
+/* Buttons */
+.btn-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.opt-btn { padding: 9px 16px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); color: var(--text); font-family: 'Roboto', sans-serif; font-size: 14px; cursor: pointer; transition: all .15s ease; text-align: left; }
+.opt-btn:hover { border-color: var(--border-strong); background: var(--surface2); }
+.opt-btn.sel { background: var(--orange); color: #fff; border-color: var(--orange); }
+.opt-btn.sel-bad { background: var(--red-bg); color: var(--red); border-color: var(--red); }
+.opt-btn.sel-warn { background: var(--amber-bg); color: var(--amber); border-color: var(--amber); }
+.opt-btn.disabled { opacity: .35; cursor: not-allowed; pointer-events: none; }
+
+/* Phone illustration cards */
+.phone-grid { display: flex; gap: 12px; }
+.phone-card {
+  flex: 1;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 20px 12px 14px;
+  cursor: pointer;
+  transition: all .18s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+}
+.phone-card:hover { border-color: var(--border-strong); background: var(--surface2); transform: translateY(-1px); }
+.phone-card.sel-ok { border-color: var(--orange); background: #FFF5F0; }
+.phone-card.sel-broken { border-color: var(--red); background: var(--red-bg); }
+.phone-card svg { display: block; }
+.phone-card-label { font-size: 14px; font-weight: 500; color: var(--text); }
+.phone-card-desc { font-size: 11px; color: var(--text-muted); line-height: 1.4; }
+.phone-card.sel-ok .phone-card-label { color: var(--orange); }
+.phone-card.sel-broken .phone-card-label { color: var(--red); }
+
+/* Condition buttons */
+.cond-btn { display: flex; flex-direction: column; gap: 3px; padding: 12px 14px; flex: 1; min-width: 140px; white-space: normal; }
+.cond-label { font-size: 14px; font-weight: 500; line-height: 1.2; }
+.cond-desc { font-size: 11px; opacity: .65; font-weight: 400; line-height: 1.4; }
+.cond-btn.sel .cond-desc { opacity: .85; }
+
+/* Select */
+select { width: 100%; font-family: 'Be Vietnam Pro', sans-serif; font-size: 15px; padding: 10px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface2); color: var(--text); appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237A7870' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; cursor: pointer; transition: border-color .15s; }
+select:focus { outline: none; border-color: var(--border-strong); }
+
+/* Battery */
+.batt-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.batt-row input[type=number] { width: 96px; font-family: 'Be Vietnam Pro', sans-serif; font-size: 18px; font-weight: 500; padding: 10px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface2); color: var(--text); text-align: center; transition: border-color .15s; }
+.batt-row input[type=number]:focus { outline: none; border-color: var(--border-strong); }
+.batt-row input[type=number]::placeholder { color: var(--border-strong); font-size: 15px; }
+.batt-row input::-webkit-inner-spin-button, .batt-row input::-webkit-outer-spin-button { -webkit-appearance: none; }
+.batt-unit { font-size: 20px; font-weight: 300; color: var(--text-muted); }
+.batt-tip { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 12px; }
+.batt-tip-toggle { font-size: 12px; color: var(--orange); cursor: pointer; text-decoration: underline; text-decoration-style: dotted; background: none; border: none; font-family: inherit; padding: 0; }
+.batt-tip-content { font-size: 12px; color: var(--text-muted); line-height: 1.7; margin-top: 8px; padding: 10px 12px; background: var(--surface2); border-radius: var(--radius-sm); }
+
+/* Logo */
+
+/* Sticky price box */
+.price-box { background: var(--accent); color: #fff; border-radius: var(--radius); padding: 24px 22px 22px; position: relative; overflow: hidden; }
+.price-box::before { content: ''; position: absolute; top: -50px; right: -50px; width: 180px; height: 180px; border-radius: 50%; background: rgba(255,255,255,0.04); pointer-events: none; }
+.price-eyebrow { font-family: 'Be Vietnam Pro', sans-serif; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; opacity: .5; margin-bottom: 8px; }
+.price-amount { font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 6px; transition: opacity .3s; }
+.price-amount.pending { opacity: .35; }
+.price-amount.single { font-size: 38px; letter-spacing: -0.03em; line-height: 1; }
+.price-amount.range { font-size: 38px; letter-spacing: -0.03em; line-height: 1.1; }
+.price-currency { font-size: 14px; font-weight: 400; opacity: .6; margin-left: 3px; }
+.price-range-sep { opacity: .5; margin: 0 4px; font-weight: 300; }
+.price-sub { font-size: 11px; opacity: .45; margin-top: 8px; line-height: 1.5; min-height: 16px; }
+.price-model { font-size: 12px; font-weight: 500; opacity: .7; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.price-disclaimer { font-size: 11px; opacity: .35; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.12); line-height: 1.5; }
+.price-cta { display: block; width: 100%; padding: 12px; background: var(--orange); color: #fff; border: none; border-radius: var(--radius-sm); font-family: 'Roboto', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; text-align: center; text-decoration: none; margin-top: 14px; transition: opacity .15s; }
+.price-cta:hover { opacity: .88; }
+.price-reset { display: block; width: 100%; padding: 10px; margin-top: 8px; background: transparent; border: 1px solid rgba(255,255,255,0.2); border-radius: var(--radius-sm); font-family: 'Roboto', sans-serif; font-size: 13px; color: rgba(255,255,255,0.6); cursor: pointer; transition: all .15s; text-align: center; }
+.price-reset:hover { border-color: rgba(255,255,255,0.5); color: #fff; }
+
+.cta-btn { display: block; width: 100%; padding: 15px; background: var(--orange); color: #fff; border: none; border-radius: var(--radius-sm); font-family: 'Roboto', sans-serif; font-size: 15px; font-weight: 500; cursor: pointer; text-align: center; text-decoration: none; margin-bottom: 10px; transition: opacity .15s; }
+.cta-btn:hover { opacity: .9; }
+.reset-btn { display: block; width: 100%; padding: 12px; background: transparent; border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: 'Roboto', sans-serif; font-size: 14px; color: var(--text-muted); cursor: pointer; transition: all .15s; text-align: center; }
+.reset-btn:hover { border-color: var(--border-strong); color: var(--text); background: var(--surface2); }
+
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10000;
+  background: #FF8E62;
+  padding: 0 24px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+}
+.topbar a { display: flex; align-items: center; }
+.topbar svg { width: 80px; height: auto; display: block; }
+.topbar svg path { fill: #fff; }
+@media (max-width: 700px) {
+  .topbar { height: 48px; padding: 0 16px; }
+  .topbar svg { width: 70px; }
+}
+.topbar{position:sticky;top:0;z-index:10000;background:#FF8E62;padding:0 24px;height:56px;display:flex;align-items:center;}
+.topbar a{display:flex;align-items:center;text-decoration:none;}
+.topbar svg{width:80px;height:auto;display:block;}
+.topbar svg path{fill:#fff !important;} .topbar svg rect{fill:#fff !important;stroke:#fff !important;}
+@media(max-width:700px){.topbar{height:48px;padding:0 16px;}.topbar svg{width:70px;}}
+.tf-popup-btn {
+  position: fixed;
+  bottom: -100px;
+  right: 24px;
+  z-index: 99999;
+  background: #210212;
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  padding: 14px 22px;
+  font-family: 'Be Vietnam Pro', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  transition: bottom .4s cubic-bezier(.4,0,.2,1), opacity .3s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tf-popup-btn.visible { bottom: 24px; }
+@media (max-width: 700px) {
+  .tf-popup-btn { bottom: -100px; right: 16px; left: 16px; justify-content: center; border-radius: 12px; }
+  .tf-popup-btn.visible { bottom: 110px; }
+}
+.hidden { display: none !important; }
+
+@media (max-width: 700px) {
+  /* ── Layout ── */
+  .outer { display: block; padding: 0; }
+  .sticky-price-col { position: fixed !important; bottom: 0; left: 0; right: 0; width: 100%; top: auto !important; z-index: 9999; }
+  .form-col { padding: 16px 16px 200px; }
+
+  /* ── Desktop price box → hidden, replaced by bottom bar ── */
+  .price-eyebrow { display: none; }
+  .price-disclaimer { display: none; }
+  .price-model { font-size: 11px; opacity: .7; margin-bottom: 3px; color: #fff !important; display: block !important; }
+  .price-reset { display: none; }
+  .price-cta { display: none; }
+  .price-box {
+    border-radius: 0;
+    padding: 14px 16px calc(16px + env(safe-area-inset-bottom));
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .price-box::before { display: none; }
+  .price-mobile-left { display: flex; flex-direction: column; gap: 2px; }
+  .price-mobile-label { font-size: 10px; font-family: "Be Vietnam Pro", sans-serif; letter-spacing: .1em; text-transform: uppercase; opacity: .5; margin-bottom: 2px; }
+  .price-amount { margin: 0; }
+  .price-amount.single { font-size: 38px; letter-spacing: -0.03em; line-height: 1; }
+  .price-amount.range { font-size: 38px; letter-spacing: -0.03em; line-height: 1.1; }
+  .price-sub { display: none; }
+  .price-mobile-cta-row { display: block; }
+  .price-mobile-cta-btn {
+    display: block; width: 100%; padding: 13px;
+    background: var(--orange); color: #fff; border: none;
+    border-radius: var(--radius-sm);
+    font-family: 'Roboto', sans-serif; font-size: 15px; font-weight: 500;
+    text-align: center; text-decoration: none; cursor: pointer;
+  }
+
+
+  /* Ensure price-model shows when it has content */
+  .sticky-price-col .price-model:not(:empty) { display: block !important; }
+
+  /* ── Form ── */
+  .card { padding: 16px; }
+  .cond-btn { min-width: calc(50% - 4px); }
+  .header { margin-bottom: 12px; }
+  .top-disclaimer { margin-bottom: 20px; font-size: 12px; }
+  .sticky-top-bar { background: var(--bg); }
+  .result-wrap { margin-top: 0; }
+}
+@media (min-width: 701px) {
+  .price-mobile-left { display: contents; }
+  .price-mobile-label { display: none; }
+  .price-mobile-cta-row { display: none; }
+}
+</style>
+<link rel="stylesheet" href="//embed.typeform.com/next/css/popup.css">
+<script src="//embed.typeform.com/next/embed.js"></script>
+</head>
+<body>
+
+<div class="topbar"><a href="https://www.vendy.se"><svg width="1526" height="567" viewBox="0 0 1526 567" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M566.526 217.676C559.845 160.532 522.393 126.597 452.062 126.597H419.71C342.169 126.597 304.015 168.444 304.015 238.248V343.569C304.015 411.438 341.29 455.395 434.303 455.395H442.04C490.568 455.395 531.888 439.395 552.987 418.823C553.515 418.296 554.042 417.768 554.394 417.416C555.976 415.307 555.976 412.317 554.394 410.032L538.218 384.712C537.339 383.482 536.284 382.603 535.053 382.075C534.877 382.075 534.701 381.899 534.35 381.899C532.767 381.548 531.009 381.723 529.251 382.427C528.723 382.602 528.196 382.954 527.492 383.306C508.679 394.207 487.403 402.647 442.216 402.647H435.71C386.654 402.647 365.379 378.031 365.379 343.92V314.381H543.844C556.152 314.381 566.35 304.711 566.878 292.403V238.072C566.878 231.214 566.526 224.533 565.823 218.027L566.526 217.676ZM366.258 272.358V238.951C366.258 202.203 386.302 182.686 422.523 182.862H449.6C478.26 182.862 496.371 194.642 502.525 217.851C504.107 224.005 504.986 230.863 504.986 238.423V272.534H366.082L366.258 272.358Z" fill="white"/>
+<path d="M775.401 126.42H760.632C723.883 126.42 695.399 140.662 680.454 163.871L672.014 177.762V138.552C672.014 133.277 667.794 128.882 662.344 128.882H619.617C614.342 128.882 609.947 133.101 609.947 138.376V442.207C609.947 447.482 614.167 451.878 619.442 451.878H662.168C667.443 451.878 671.838 447.658 671.838 442.383V240.708C671.838 203.257 695.223 182.509 733.378 182.685H759.928C797.38 182.685 815.49 203.433 815.49 241.412V442.559C815.49 447.13 818.479 450.823 822.699 451.878C823.226 451.878 823.754 451.878 824.457 451.878H868.942C869.645 451.878 870.173 451.878 870.876 451.878C874.92 450.823 878.085 446.955 878.085 442.559V235.609C878.085 164.575 849.249 126.42 775.577 126.42H775.401Z" fill="white"/>
+<path d="M1182.46 0.351624C1181.75 0.175796 1181.05 0 1180.17 0H1136.92C1136.21 0 1135.34 -3.22003e-05 1134.63 0.351624C1134.63 0.351624 1134.46 0.351624 1134.28 0.351624C1130.24 1.40659 1127.07 5.27485 1127.07 9.67055V176.18L1125.84 173.542C1118.81 157.542 1106.85 144.179 1091.2 136.267C1078.89 130.113 1063.6 126.596 1044.96 126.596H1030.19C957.925 126.596 921.704 164.575 921.704 235.61V346.03C921.704 417.064 957.749 455.219 1030.19 455.219H1044.96C1074.85 455.219 1095.77 446.076 1110.54 431.658C1115.99 426.383 1120.39 420.054 1124.08 413.372L1127.07 408.097V443.087C1127.25 447.483 1130.24 450.999 1134.46 452.054C1134.98 452.054 1135.51 452.054 1136.04 452.054H1180.52C1181.05 452.054 1181.58 452.054 1182.11 452.054C1182.11 452.054 1182.28 452.054 1182.46 452.054C1186.5 450.999 1189.67 447.131 1189.67 442.735V9.31887C1189.67 4.92317 1186.68 1.40659 1182.46 0.351624ZM1127.07 341.634C1127.07 378.382 1106.32 399.13 1070.81 399.13H1040.39C1004.17 399.13 983.596 378.382 983.596 340.931V240.885C983.596 203.433 1004.34 182.685 1040.56 182.861H1070.98C1106.5 182.861 1127.25 203.609 1127.07 240.357V341.81V341.634Z" fill="white"/>
+<path d="M1460.62 140.135C1463.25 133.102 1465.71 129.234 1472.22 129.234H1517.41C1523.91 129.234 1526.38 133.102 1524.44 139.608L1367.95 556.145C1365.32 562.65 1363.38 566.519 1356.35 566.519H1311.86C1305.36 566.519 1302.9 562.65 1304.83 556.145L1342.28 458.033L1222.9 139.608C1220.26 133.102 1222.9 129.234 1229.4 129.234H1275.29C1281.8 129.234 1283.73 133.102 1286.19 140.311L1373.76 384.536L1460.62 140.311V140.135Z" fill="white"/>
+<path d="M279.573 129.057H235.088C228.055 129.057 225.417 132.925 223.483 139.431L145.943 393.327L143.657 400.536L141.372 393.327L63.8314 139.431C61.8973 132.925 59.2599 129.057 52.2267 129.057H7.74222C1.4124 129.057 -1.22503 132.749 0.533249 139.079L37.2813 257.06L84.4033 408.448C84.4033 408.975 84.7549 409.503 84.9308 410.03C84.9308 410.382 85.1066 410.558 85.2824 410.909C89.5023 422.866 97.2387 432.888 106.909 439.921C117.283 447.658 130.119 452.053 143.657 452.053C157.196 452.053 170.032 447.658 180.405 439.921C190.076 432.712 197.812 422.69 202.032 410.909C202.032 410.558 202.208 410.382 202.384 410.03C202.56 409.503 202.736 408.975 202.911 408.448L250.033 257.06L286.782 139.079C288.54 132.925 285.902 129.057 279.573 129.057Z" fill="white"/>
+</svg></a></div>
+
+
+<div class="outer">
+
+  <div class="sticky-price-col">
+  <div class="price-box">
+      <div class="price-mobile-left">
+        <div class="price-eyebrow">Uppskattat värde</div>
+        <span class="price-mobile-label">Uppskattat värde</span>
+        <div class="price-model hidden" id="price-model"></div>
+        <div class="price-amount pending" id="price-amount"><span id="price-amt">—</span></div>
+        <div class="price-sub" id="price-sub"></div>
+      </div>
+      <div class="price-disclaimer">Detta är en uppskattning. Slutpris bekräftas i kiosken. Vi betalar via Swish.</div>
+      <a href="https://www.vendykiosk.com/sv/loc" target="_blank" class="price-cta">Hitta din närmaste kiosk här</a>
+      <button class="price-reset" onclick="resetAll()">Börja om</button>
+      <div class="price-mobile-cta-row hidden" id="price-mobile-cta-row">
+        <a href="https://www.vendykiosk.com/sv/loc" target="_blank" class="price-mobile-cta-btn">Hitta din närmaste kiosk här</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-col">
+
+  <div class="header">
+    <h1>Vad är din telefon värd?</h1>
+  </div>
+
+  <div class="top-disclaimer">
+    <strong>Detta är endast en uppskattning.</strong> Det slutgiltiga priset bekräftas av kiosken i butik. Godkänner du priset i kiosken betalar vi dig på två sekunder via Swish.
+  </div>
+
+
+
+  <!-- Step 1: Brand -->
+  <div class="card active" id="s-brand">
+    <div class="step-meta"><span class="step-num">01</span><span class="step-title">Välj märke</span></div>
+    <div class="btn-grid" style="align-items:flex-start">
+      <button class="opt-btn sel" onclick="selectBrand('Apple',this)">Apple</button>
+      <div style="display:flex;flex-direction:column;align-items:flex-start;gap:4px">
+        <button class="opt-btn disabled">Samsung</button>
+        <span style="font-size:11px;color:var(--text-muted);padding-left:2px;font-style:italic">Kommer snart</span>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-start;gap:4px">
+        <button class="opt-btn disabled">Other</button>
+        <span style="font-size:11px;color:var(--text-muted);padding-left:2px;font-style:italic">Kommer snart</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2: Model -->
+  <div class="card hidden" id="s-model">
+    <div class="step-meta"><span class="step-num">02</span><span class="step-title">Välj modell</span></div>
+    <select id="sel-model" onchange="onModelChange()"><option value="">— Välj din iPhone —</option></select>
+  </div>
+
+  <!-- Step 3: Storage -->
+  <div class="card hidden" id="s-storage">
+    <div class="step-meta"><span class="step-num">03</span><span class="step-title">Lagringsutrymme</span></div>
+    <div class="btn-grid" id="storage-opts"></div>
+  </div>
+
+  <!-- Step 4: Screen -->
+  <div class="card hidden" id="s-screen">
+    <div class="step-meta"><span class="step-num">04</span><span class="step-title">I vilket skick är din skärm?</span></div>
+    <div class="phone-grid">
+      <div class="phone-card" id="screen-ok" onclick="setScreen('ok',this)">
+        <svg width="56" height="100" viewBox="0 0 56 100" fill="none">
+          <rect x="3" y="3" width="50" height="94" rx="8" stroke="#210212" stroke-width="2" fill="none"/>
+          <rect x="9" y="11" width="38" height="68" rx="2" stroke="#210212" stroke-width="1.5" fill="none"/>
+          <rect x="21" y="85" width="14" height="4" rx="2" fill="#210212"/>
+          <rect x="22" y="5.5" width="12" height="2.5" rx="1.25" fill="#210212"/>
+        </svg>
+        <div class="phone-card-label">Inga skador</div>
+        <div class="phone-card-desc">Skärmen är hel och oskadad</div>
+      </div>
+      <div class="phone-card" id="screen-broken" onclick="setScreen('broken',this)">
+        <svg width="56" height="100" viewBox="0 0 56 100" fill="none">
+          <rect x="3" y="3" width="50" height="94" rx="8" stroke="#210212" stroke-width="2" fill="none"/>
+          <rect x="9" y="11" width="38" height="68" rx="2" stroke="#210212" stroke-width="1.5" fill="none"/>
+          <path d="M22 13 L17 30 L25 33 L13 58" stroke="#9B2335" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <path d="M17 30 L10 38" stroke="#9B2335" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+          <path d="M25 33 L30 24" stroke="#9B2335" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+          <path d="M36 16 L40 40 L33 44 L44 72" stroke="#9B2335" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <path d="M40 40 L47 46" stroke="#9B2335" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+          <rect x="21" y="85" width="14" height="4" rx="2" fill="#210212"/>
+          <rect x="22" y="5.5" width="12" height="2.5" rx="1.25" fill="#210212"/>
+        </svg>
+        <div class="phone-card-label">Trasig / sprucken</div>
+        <div class="phone-card-desc">Skärmen har sprickor eller är skadad</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 5: Back -->
+  <div class="card hidden" id="s-back">
+    <div class="step-meta"><span class="step-num">05</span><span class="step-title">I vilket skick är baksidan och ramen på din enhet?</span></div>
+    <div class="phone-grid">
+      <div class="phone-card" id="back-ok" onclick="setBack('ok',this)">
+        <svg width="56" height="100" viewBox="0 0 56 100" fill="none">
+          <rect x="3" y="3" width="50" height="94" rx="8" stroke="#210212" stroke-width="2" fill="none"/>
+          <rect x="9" y="11" width="18" height="18" rx="4" stroke="#210212" stroke-width="1.5" fill="none"/>
+          <circle cx="18" cy="20" r="5" stroke="#210212" stroke-width="1.5" fill="none"/>
+          <circle cx="18" cy="20" r="2" fill="#210212"/>
+          <circle cx="24" cy="14" r="2.5" stroke="#210212" stroke-width="1.2" fill="none"/>
+          <rect x="2" y="30" width="1.5" height="11" rx=".75" fill="#210212"/>
+          <rect x="2" y="45" width="1.5" height="8" rx=".75" fill="#210212"/>
+          <rect x="52.5" y="36" width="1.5" height="14" rx=".75" fill="#210212"/>
+        </svg>
+        <div class="phone-card-label">Inga skador</div>
+        <div class="phone-card-desc">Baksidan och ramen är hela</div>
+      </div>
+      <div class="phone-card" id="back-broken" onclick="setBack('broken',this)">
+        <svg width="56" height="100" viewBox="0 0 56 100" fill="none">
+          <rect x="3" y="3" width="50" height="94" rx="8" stroke="#210212" stroke-width="2" fill="none"/>
+          <rect x="9" y="11" width="18" height="18" rx="4" stroke="#210212" stroke-width="1.5" fill="none"/>
+          <circle cx="18" cy="20" r="5" stroke="#210212" stroke-width="1.5" fill="none"/>
+          <circle cx="18" cy="20" r="2" fill="#210212"/>
+          <circle cx="24" cy="14" r="2.5" stroke="#210212" stroke-width="1.2" fill="none"/>
+          <path d="M34 42 L40 58 L33 62 L42 82" stroke="#9B2335" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <path d="M40 58 L48 63" stroke="#9B2335" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+          <path d="M33 62 L28 70" stroke="#9B2335" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+          <path d="M14 65 L20 82" stroke="#9B2335" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+          <path d="M14 65 L8 74" stroke="#9B2335" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+          <rect x="2" y="30" width="1.5" height="11" rx=".75" fill="#210212"/>
+          <rect x="2" y="45" width="1.5" height="8" rx=".75" fill="#210212"/>
+          <rect x="52.5" y="36" width="1.5" height="14" rx=".75" fill="#210212"/>
+        </svg>
+        <div class="phone-card-label">Trasig / sprucken</div>
+        <div class="phone-card-desc">Baksidan eller ramen är skadad</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 6: Battery (moved up) -->
+  <div class="card hidden" id="s-battery">
+    <div class="step-meta"><span class="step-num">06</span>
+      <div>
+        <div class="step-title">Batterihälsa</div>
+      </div>
+    </div>
+    <div class="btn-grid">
+      <button class="opt-btn cond-btn" onclick="setBattery('good', this)">
+        <span class="cond-label">85% eller mer</span>
+        <span class="cond-desc">Batteriet är i bra skick</span>
+      </button>
+      <button class="opt-btn cond-btn" onclick="setBattery('low', this)">
+        <span class="cond-label">Under 85%</span>
+        <span class="cond-desc">Batteriet kan behöva bytas</span>
+      </button>
+    </div>
+    <div class="batt-tip" style="margin-top:14px">
+      <button class="batt-tip-toggle" onclick="toggleBattTip(this)">Hur kollar jag min batterihälsa? →</button>
+      <div class="batt-tip-content hidden" id="batt-tip-content">
+        På din iPhone, gå till <strong>Inställningar → Batteri → Batterihälsa och laddning</strong>. Procentsatsen som visas bredvid "Maximal kapacitet" är din batterihälsa.
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 7: Condition (moved down, now step 7) -->
+  <div class="card hidden" id="s-condition">
+    <div class="step-meta">
+      <span class="step-num">07</span>
+      <div>
+        <div class="step-title">Uppskattat skick på din telefon</div>
+        <div class="step-subtitle">Det exakta skicket bekräftas i kiosken</div>
+      </div>
+    </div>
+    <div class="btn-grid">
+      <button class="opt-btn cond-btn" onclick="setCondition('good',this)">
+        <span class="cond-label">Mycket bra skick</span>
+        <span class="cond-desc">Endast mindre spår av användning</span>
+      </button>
+      <button class="opt-btn cond-btn" onclick="setCondition('ok',this)">
+        <span class="cond-label">Bra skick</span>
+        <span class="cond-desc">Synliga repor men inga sprickor</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Result actions -->
+  <div class="result-wrap hidden" id="result-wrap">
+    <button class="reset-btn" onclick="resetAll()">Börja om</button>
+  </div>
+
+  </div><!-- /form-col -->
+</div><!-- /outer -->
+
+<script>
+const PRICES=[
+["iPhone 11 Pro Max","256G",1512,1102.5,829.5,619.5,493.5,105,105,105],
+["iPhone 11 Pro Max","512G",1921.5,1480.5,1176,966,493.5,105,105,105],
+["iPhone 11 Pro Max","64G",1239,850.5,598.5,388.5,493.5,105,105,105],
+["iPhone 11 Pro","256G",1197,745.5,703.5,472.5,493.5,105,105,105],
+["iPhone 11 Pro","512G",1837.5,1417.5,1155,945,493.5,105,105,105],
+["iPhone 11 Pro","64G",882,546,525,315,493.5,105,105,105],
+["iPhone 11","128G",903,651,630,462,493.5,105,105,105],
+["iPhone 11","256G",1228.5,966,924,651,493.5,105,105,105],
+["iPhone 11","64G",703.5,514.5,430.5,283.5,493.5,105,105,105],
+["iPhone 12 Pro Max","128G",2257.5,1606.5,1459.5,1249.5,493.5,525,787.5,525],
+["iPhone 12 Pro Max","256G",2457,1785,1606.5,1396.5,493.5,525,787.5,525],
+["iPhone 12 Pro Max","512G",2761.5,2058,1848,1638,493.5,525,787.5,525],
+["iPhone 12 mini","128G",1060.5,672,535.5,325.5,493.5,105,105,105],
+["iPhone 12 mini","256G",1375.5,955.5,798,588,493.5,105,105,105],
+["iPhone 12 mini","64G",903,525,399,189,493.5,105,105,105],
+["iPhone 12 pro","128G",1816.5,1396.5,1134,924,493.5,420,787.5,420],
+["iPhone 12 pro","256G",2047.5,1617,1333.5,1123.5,493.5,420,787.5,420],
+["iPhone 12 pro","512G",2331,1869,1564.5,1354.5,493.5,420,787.5,420],
+["iPhone 12","128G",1291.5,966,829.5,619.5,493.5,105,210,105],
+["iPhone 12","256G",1533,1155,987,777,493.5,105,210,105],
+["iPhone 12","64G",1102.5,787.5,651,441,493.5,105,210,105],
+["iPhone 13 Pro Max","128G",2824.5,2320.5,2121,1911,535.5,840,1260,840],
+["iPhone 13 Pro Max","1T",4368,3769.5,3549,3339,535.5,840,1260,840],
+["iPhone 13 Pro Max","256G",3244.5,2740.5,2551.5,2341.5,535.5,840,1260,840],
+["iPhone 13 Pro Max","512G",3706.5,3139.5,2950.5,2740.5,535.5,840,1260,840],
+["iPhone 13 Pro","128G",2635.5,2131.5,1921.5,1711.5,535.5,840,1050,840],
+["iPhone 13 Pro","1T",3948,3318,2803.5,2593.5,535.5,840,1050,840],
+["iPhone 13 Pro","256G",3045,2520,2278.5,2068.5,535.5,840,1050,840],
+["iPhone 13 Pro","512G",3433.5,2877,2520,2310,535.5,840,1050,840],
+["iPhone 13 mini","128G",1722,1428,1333.5,1123.5,535.5,420,630,420],
+["iPhone 13 mini","256G",2215.5,1953,1848,1638,535.5,420,630,420],
+["iPhone 13 mini","512G",3475.5,2824.5,2394,2184,535.5,420,630,420],
+["iPhone 13","128G",1879.5,1491,1344,1134,535.5,525,735,525],
+["iPhone 13","256G",2247,1827,1638,1428,535.5,525,735,525],
+["iPhone 13","512G",2898,2404.5,2194.5,1984.5,535.5,525,735,525],
+["iPhone 14 Plus","128G",2740.5,2226,2068.5,1806,535.5,735,1050,735],
+["iPhone 14 Plus","256G",3370.5,2709,2530.5,2268,535.5,735,1050,735],
+["iPhone 14 Plus","512G",4053,3475.5,3255,2992.5,535.5,735,1050,735],
+["iPhone 14 Pro Max","128G",3969,3160.5,2971.5,2709,535.5,1207.5,1785,1207.5],
+["iPhone 14 Pro Max","1T",5764.5,4956,4116,3853.5,535.5,1207.5,1785,1207.5],
+["iPhone 14 Pro Max","256G",4473,3622.5,3412.5,3150,535.5,1207.5,1785,1207.5],
+["iPhone 14 Pro Max","512G",5292,4357.5,4084.5,3822,535.5,1207.5,1785,1207.5],
+["iPhone 14 Pro","128G",3601.5,3034.5,2824.5,2562,535.5,1102.5,1575,1102.5],
+["iPhone 14 Pro","1T",5155.5,4536,4158,3895.5,535.5,1102.5,1575,1102.5],
+["iPhone 14 Pro","256G",4063.5,3528,3223.5,2929.5,535.5,1102.5,1575,1102.5],
+["iPhone 14 Pro","512G",4662,4000.5,3727.5,3465,535.5,1102.5,1575,1102.5],
+["iPhone 14","128G",2425.5,1995,1837.5,1575,535.5,735,1155,735],
+["iPhone 14","256G",2940,2499,2373,2110.5,535.5,735,1155,735],
+["iPhone 14","512G",3759,3265.5,2887.5,2625,535.5,735,1155,735],
+["iPhone 15 Plus","128G",3664.5,3108,3013.5,2751,588,1155,2100,1155],
+["iPhone 15 Plus","256G",4357.5,3769.5,3433.5,3171,588,1155,2100,1155],
+["iPhone 15 Plus","512G",5743.5,5050.5,4452,3874.5,588,1155,2100,1155],
+["iPhone 15 Pro Max","1T",5985,5376,4410,4147.5,588,1575,3045,1575],
+["iPhone 15 Pro Max","256G",5092.5,4305,4042.5,3780,588,1575,3045,1575],
+["iPhone 15 Pro Max","512G",5565,4872,4116,3853.5,588,1575,3045,1575],
+["iPhone 15 Pro","128G",4462.5,3780,3570,3307.5,588,1575,2625,1575],
+["iPhone 15 Pro","1T",6352.5,5533.5,4735.5,4473,588,1575,2625,1575],
+["iPhone 15 Pro","256G",4914,4210.5,3843,3580.5,588,1575,2625,1575],
+["iPhone 15 Pro","512G",5628,4924.5,4294.5,4032,588,1575,2625,1575],
+["iPhone 15","128G",3580.5,3160.5,2824.5,2562,588,1155,1785,1155],
+["iPhone 15","256G",4116,3675,3024,2761.5,588,1155,1785,1155],
+["iPhone 15","512G",4798.5,4252.5,3822,3559.5,588,1155,1785,1155],
+["iPhone 16 Plus","128G",5292,4620,3612,3349.5,630,1575,2100,1575],
+["iPhone 16 Plus","256G",6321,5775,4515,4252.5,630,1575,2100,1575],
+["iPhone 16 Plus","512G",6982.5,6562.5,5796,5008.5,630,1575,2100,1575],
+["iPhone 16 Pro Max","1T",7654.5,7339.5,7077,6153,630,2100,3675,2100],
+["iPhone 16 Pro Max","256G",5995.5,5680.5,5449.5,5187,630,2100,3675,2100],
+["iPhone 16 Pro Max","512G",7045.5,6730.5,6552,6079.5,630,2100,3675,2100],
+["iPhone 16 Pro","128G",6247.5,5565,4714.5,4452,630,2100,3150,2100],
+["iPhone 16 Pro","1T",8421,8106,6615,6352.5,630,2100,3150,2100],
+["iPhone 16 Pro","256G",6909,5985,5218.5,4956,630,2100,3150,2100],
+["iPhone 16 Pro","512G",8127,7371,6447,6142.5,630,2100,3150,2100],
+["iPhone 16","128G",5008.5,4200,3916.5,3654,630,1155,2625,1155],
+["iPhone 16","256G",5953.5,5281.5,4546.5,4284,630,1155,2625,1155],
+["iPhone 16","512G",6352.5,5712,4882.5,4620,630,1155,2625,1155],
+["iPhone 16e","128G",3538.5,2940,2467.5,2205,630,1155,1785,1155],
+["iPhone 16e","256G",4200,3643.5,3150,2887.5,630,1155,1785,1155],
+["iPhone 16e","512G",5155.5,4420.5,3370.5,3108,630,1155,1785,1155],
+["iPhone 17 Pro Max","1T",12159,10972.5,10384.5,10122,2100,2100,3675,2100],
+["iPhone 17 Pro Max","256G",9345,8442,7990.5,7728,2100,2100,3675,2100],
+["iPhone 17 Pro Max","2T",13891.5,12526.5,11854.5,11592,2100,2100,3675,2100],
+["iPhone 17 Pro Max","512G",10857,9796.5,9271.5,9009,2100,2100,3675,2100],
+["iPhone 17 Pro","1T",10384.5,9376.5,8872.5,8610,2100,2100,3675,2100],
+["iPhone 17 Pro","256G",8515.5,7696.5,7287,7024.5,2100,2100,3675,2100],
+["iPhone 17 Pro","512G",9828,8883,8400,8137.5,2100,2100,3675,2100],
+["iPhone 17","256G",5859,5302.5,5019,4756.5,2100,2100,3675,2100],
+["iPhone 17","512G",6762,6111,5796,5533.5,2100,2100,3675,2100],
+["iPhone 17e","256G",4945.5,4410,4053,3790.5,2100,2100,3675,2100],
+["iPhone 17e","512G",6583.5,6037.5,5659.5,5397,2100,2100,3675,2100],
+["iPhone 7 Plus","128G",52.5,52.5,52.5,52.5,0,52.5,52.5,52.5],
+["iPhone 7 Plus","256G",52.5,52.5,52.5,52.5,0,52.5,52.5,52.5],
+["iPhone 7 Plus","32G",52.5,52.5,52.5,52.5,0,52.5,52.5,52.5],
+["iPhone 7","128G",52.5,52.5,52.5,52.5,0,52.5,52.5,52.5],
+["iPhone 7","256G",52.5,52.5,52.5,52.5,0,52.5,52.5,52.5],
+["iPhone 7","32G",52.5,52.5,52.5,52.5,0,52.5,52.5,52.5],
+["iPhone 8 Plus","128G",52.5,52.5,52.5,52.5,0,52.5,52.5,52.5],
+["iPhone 8 Plus","256G",52.5,52.5,52.5,52.5,0,52.5,52.5,52.5],
+["iPhone 8 Plus","64G",52.5,52.5,52.5,52.5,0,52.5,52.5,52.5],
+["iPhone 8","128G",52.5,52.5,52.5,52.5,0,52.5,52.5,52.5],
+["iPhone 8","256G",52.5,52.5,52.5,52.5,0,52.5,52.5,52.5],
+["iPhone 8","64G",52.5,52.5,52.5,52.5,0,52.5,52.5,52.5],
+["iPhone Air","1T",7644,6909,6541.5,6279,2100,2100,3150,2100],
+["iPhone Air","256G",6142.5,5554.5,5260.5,4998,2100,2100,3150,2100],
+["iPhone Air","512G",7182,6489,6153,5890.5,2100,2100,3150,2100],
+["iPhone SE 3","128G",1123.5,850.5,756,546,252,105,105,105],
+["iPhone SE 3","256G",1659,1270.5,777,567,252,105,105,105],
+["iPhone SE 3","64G",735,472.5,430.5,220.5,252,105,105,105],
+["iPhone SE","128G",52.5,52.5,52.5,52.5,52.5,52.5,52.5,52.5],
+["iPhone SE","16G",52.5,52.5,52.5,52.5,52.5,52.5,52.5,52.5],
+["iPhone SE","32G",52.5,52.5,52.5,52.5,52.5,52.5,52.5,52.5],
+["iPhone SE","64G",52.5,52.5,52.5,52.5,52.5,52.5,52.5,52.5],
+["iPhone SE2","128G",52.5,52.5,52.5,52.5,52.5,52.5,52.5,52.5],
+["iPhone SE2","256G",52.5,52.5,52.5,52.5,52.5,52.5,52.5,52.5],
+["iPhone SE2","64G",52.5,52.5,52.5,52.5,52.5,52.5,52.5,52.5],
+["iPhone X","256G",52.5,52.5,52.5,52.5,0,52.5,52.5,52.5],
+["iPhone X","64G",52.5,52.5,52.5,52.5,0,52.5,52.5,52.5],
+["iPhone XR","128G",105,105,105,52.5,105,52.5,52.5,52.5],
+["iPhone XR","256G",105,105,105,52.5,105,52.5,52.5,52.5],
+["iPhone XR","64G",105,105,105,52.5,105,52.5,52.5,52.5],
+["iPhone XS Max","256G",105,105,105,52.5,105,52.5,52.5,52.5],
+["iPhone XS Max","512G",105,105,105,52.5,105,52.5,52.5,52.5],
+["iPhone XS Max","64G",105,105,105,52.5,105,52.5,52.5,52.5],
+["iPhone XS","256G",105,105,105,52.5,105,52.5,52.5,52.5],
+["iPhone XS","512G",105,105,105,52.5,105,52.5,52.5,52.5],
+["iPhone XS","64G",105,105,105,52.5,105,52.5,52.5,52.5],
+];
+
+// cols: model,storage,asNew(2),vGood(3),good(4),heavy(5),battDed(6),brokenScreen(7),brokenBack(8),minPrice(9)
+let state={brand:'Apple',model:null,storage:null,screen:null,back:null,battery:null,condition:null};
+
+function show(id){document.getElementById(id).classList.remove('hidden')}
+function hide(id){document.getElementById(id).classList.add('hidden')}
+function clearBtns(c){c.querySelectorAll('.opt-btn').forEach(b=>b.classList.remove('sel','sel-bad','sel-warn'))}
+function updateProgress(){}
+
+function activateCard(id){
+  const el=document.getElementById(id);
+  el.classList.add('active');el.classList.remove('done');
+  // On mobile, only scroll when navigating forward (not on init)
+  if(window._appReady && window.innerWidth<=700){
+    setTimeout(()=>{
+      const y=el.getBoundingClientRect().top+window.scrollY-80;
+      window.scrollTo({top:y,behavior:'smooth'});
+    },80);
+  } else if(window.innerWidth>700){
+    setTimeout(()=>{
+      const y=el.getBoundingClientRect().top+window.scrollY-24;
+      window.scrollTo({top:y,behavior:'smooth'});
+    },80);
+  }
+}
+function doneCard(id){
+  const el=document.getElementById(id);
+  el.classList.remove('active');el.classList.add('done');
+}
+
+function resetPriceDisplay(){
+  const pb=document.getElementById('price-amount');
+  if(pb){pb.innerHTML='<span>—</span>';pb.classList.remove('single','range');pb.classList.add('pending');}
+  const ps=document.getElementById('price-sub');if(ps)ps.textContent='';
+  const cta=document.getElementById('price-mobile-cta-row');if(cta)cta.classList.add('hidden');
+  hide('result-wrap');
+}
+
+function resetModelDisplay(){
+  const pm=document.getElementById('price-model');
+  if(pm){pm.textContent='';pm.classList.add('hidden');}
+}
+
+function fmt(n){
+  const r=Math.round(n);
+  if(r<60) return (Math.round(r/50)*50).toLocaleString('sv-SE');
+  if(r<100) return r.toLocaleString('sv-SE');
+  return (Math.ceil(r/100)*100).toLocaleString('sv-SE');
+}
+
+function showResult(lo,hi,sub){
+  const box=document.getElementById('price-amount');
+  if(box){
+    box.classList.remove('pending','single','range');
+    if(hi){box.classList.add('range');box.innerHTML=lo+'<span class="price-range-sep"> – </span>'+hi+' <span class="price-currency">kr</span>';}
+    else{box.classList.add('single');box.innerHTML=lo+' <span class="price-currency">kr</span>';}
+  }
+  const ps=document.getElementById('price-sub');if(ps)ps.textContent=sub||'';
+  const cta=document.getElementById('price-mobile-cta-row');if(cta)cta.classList.remove('hidden');
+  show('result-wrap');
+}
+
+function computeAndShow(){
+  const row=PRICES.find(r=>r[0]===state.model&&r[1]===state.storage);
+  if(!row)return;
+  const[,,asNew,vGood,good,heavy,battDed,brokenScreen,brokenBack,minPrice]=row;
+  if(state.screen==='broken'){showResult(fmt(brokenScreen),null,'Baserat på trasig skärm');return;}
+  if(state.back==='broken'){showResult(fmt(brokenBack),null,'Baserat på trasig baksida / ram');return;}
+  if(!state.condition)return;
+  const battLow=state.battery!==null&&state.battery<85;
+  const applyB=v=>battLow&&battDed>0?Math.max(v-battDed,minPrice):Math.max(v,minPrice);
+  let lo,hi,sub;
+  if(state.condition==='good'){lo=applyB(vGood);hi=applyB(asNew);sub=battLow?'Mycket bra skick, batteriavdrag tillämpat':'Mycket bra skick';}
+  else{lo=applyB(heavy);hi=applyB(good);sub=battLow?'Bra skick, batteriavdrag tillämpat':'Bra skick';}
+  showResult(fmt(lo),lo===hi?null:fmt(hi),sub);
+}
+
+function resetFrom(from){
+  const order=['model','storage','screen','back','battery','condition'];
+  const idx=order.indexOf(from);
+  if(idx<=1)state.storage=null;
+  if(idx<=2)state.screen=null;
+  if(idx<=3)state.back=null;
+  if(idx<=4)state.battery=null;
+  if(idx<=5)state.condition=null;
+  resetPriceDisplay();
+}
+
+function selectBrand(b,el){
+  clearBtns(el.parentElement);el.classList.add('sel');
+  state.brand=b;doneCard('s-brand');
+  populateModels();show('s-model');activateCard('s-model');
+  ['s-storage','s-screen','s-back','s-battery','s-condition','result-wrap'].forEach(hide);
+  resetFrom('model');
+}
+
+function populateModels(){
+  const sel=document.getElementById('sel-model');
+  const order=["iPhone 17 Pro Max","iPhone 17 Pro","iPhone 17","iPhone 17e","iPhone Air","iPhone 16 Pro Max","iPhone 16 Pro","iPhone 16 Plus","iPhone 16","iPhone 16e","iPhone 15 Pro Max","iPhone 15 Pro","iPhone 15 Plus","iPhone 15","iPhone 14 Pro Max","iPhone 14 Pro","iPhone 14 Plus","iPhone 14","iPhone 13 Pro Max","iPhone 13 Pro","iPhone 13 mini","iPhone 13","iPhone 12 Pro Max","iPhone 12 pro","iPhone 12 mini","iPhone 12","iPhone 11 Pro Max","iPhone 11 Pro","iPhone 11","iPhone XS Max","iPhone XS","iPhone XR","iPhone X","iPhone SE 3","iPhone SE2","iPhone SE","iPhone 8 Plus","iPhone 8","iPhone 7 Plus","iPhone 7"];
+  const all=[...new Set(PRICES.map(r=>r[0]))];
+  const models=[...order.filter(m=>all.includes(m)),...all.filter(m=>!order.includes(m))];
+  sel.innerHTML='<option value="">— Välj din iPhone —</option>';
+  models.forEach(m=>{const o=document.createElement('option');o.value=m;o.textContent=m;sel.appendChild(o)});
+}
+
+const OLD_MODELS=['iPhone 7','iPhone 7 Plus','iPhone 8','iPhone 8 Plus','iPhone SE','iPhone SE2','iPhone X','iPhone XS','iPhone XS Max','iPhone XR'];
+
+function onModelChange(){
+  const m=document.getElementById('sel-model').value;
+  state.model=m;resetFrom('storage');
+  ['s-storage','s-screen','s-back','s-battery','s-condition','result-wrap'].forEach(hide);
+  if(!m){ resetModelDisplay(); return; }
+  doneCard('s-model');
+  if(OLD_MODELS.includes(m)){
+    const pm=document.getElementById('price-model');
+    if(pm){pm.textContent=m;pm.classList.remove('hidden');}
+    showResult('50',null,'Fast pris för äldre modell');
+    return;
+  }
+  const storages=[...new Set(PRICES.filter(r=>r[0]===m).map(r=>r[1]))];
+  const toGB=s=>s.endsWith('T')?parseFloat(s)*1024:parseFloat(s);
+  const lbl=s=>s.endsWith('T')?parseFloat(s)+'TB':parseFloat(s)+'GB';
+  storages.sort((a,b)=>toGB(a)-toGB(b));
+  const cont=document.getElementById('storage-opts');cont.innerHTML='';
+  storages.forEach(s=>{
+    const b=document.createElement('button');b.className='opt-btn';b.textContent=lbl(s);
+    b.onclick=()=>{
+      clearBtns(cont);b.classList.add('sel');state.storage=s;
+      const pm=document.getElementById('price-model');
+      if(pm){pm.textContent=state.model+' · '+lbl(s);pm.classList.remove('hidden');}
+      doneCard('s-storage');resetFrom('screen');
+      show('s-screen');activateCard('s-screen');
+      ['s-back','s-battery','s-condition','result-wrap'].forEach(hide);
+    };
+    cont.appendChild(b);
+  });
+  show('s-storage');activateCard('s-storage');
+}
+
+function setScreen(val,el){
+  document.querySelectorAll('#s-screen .phone-card').forEach(c=>c.classList.remove('sel-ok','sel-broken'));
+  el.classList.add(val==='broken'?'sel-broken':'sel-ok');
+  state.screen=val;resetFrom('back');
+  ['s-back','s-battery','s-condition','result-wrap'].forEach(hide);
+  doneCard('s-screen');
+  if(val==='broken'){computeAndShow();return;}
+  show('s-back');activateCard('s-back');
+}
+
+function setBack(val,el){
+  document.querySelectorAll('#s-back .phone-card').forEach(c=>c.classList.remove('sel-ok','sel-broken'));
+  el.classList.add(val==='broken'?'sel-broken':'sel-ok');
+  state.back=val;resetFrom('battery');
+  ['s-battery','s-condition','result-wrap'].forEach(hide);
+  doneCard('s-back');
+  if(val==='broken'){computeAndShow();return;}
+  show('s-battery');activateCard('s-battery');
+}
+
+function setBattery(val,el){
+  clearBtns(el.parentElement);el.classList.add('sel');
+  state.battery=val==='good'?100:50;
+  doneCard('s-battery');
+  if(state.condition){
+    // Already has a condition selected — just recompute price
+    computeAndShow();
+  } else {
+    show('s-condition');activateCard('s-condition');
+  }
+}
+
+function setCondition(val,el){
+  clearBtns(el.parentElement);el.classList.add('sel');
+  state.condition=val;
+  doneCard('s-condition');
+  computeAndShow();
+  setTimeout(()=>{
+    const rw=document.getElementById('result-wrap');
+    if(rw)rw.scrollIntoView({behavior:'smooth',block:'nearest'});
+  },150);
+}
+
+function toggleBattTip(btn){
+  const c=document.getElementById('batt-tip-content');
+  c.classList.toggle('hidden');
+  btn.textContent=c.classList.contains('hidden')?'Hur kollar jag min batterihälsa? →':'Hur kollar jag min batterihälsa? ↑';
+}
+
+function resetAll(){
+  state={brand:'Apple',model:null,storage:null,screen:null,back:null,battery:null,condition:null};
+  ['s-model','s-storage','s-screen','s-back','s-battery','s-condition','result-wrap'].forEach(hide);
+  ['s-brand','s-model','s-storage','s-screen','s-back','s-battery','s-condition'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.classList.remove('done','active');
+  });
+  document.querySelectorAll('.opt-btn').forEach(b=>b.classList.remove('sel','sel-bad','sel-warn'));
+  document.querySelectorAll('.phone-card').forEach(c=>c.classList.remove('sel-ok','sel-broken'));
+  document.getElementById('sel-model').value='';
+  document.getElementById('storage-opts').innerHTML='';
+  document.getElementById('s-brand').classList.add('active');
+  document.querySelector('#s-brand .opt-btn').classList.add('sel');
+  document.getElementById('batt-tip-content').classList.add('hidden');
+  document.querySelector('.batt-tip-toggle').textContent='Hur kollar jag min batterihälsa? →';
+  resetPriceDisplay();
+  resetModelDisplay();
+  populateModels();show('s-model');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// Prevent browser from restoring scroll position
+if('scrollRestoration' in history) history.scrollRestoration='manual';
+
+populateModels();show('s-model');activateCard('s-model');
+document.querySelector('#s-brand .opt-btn').classList.add('sel');
+
+let surveyShown = false;
+function showTypeformPopup(){
+  if(surveyShown) return;
+  surveyShown = true;
+  function tryOpen(){
+    if(window.tf && window.tf.createPopup){
+      window.tf.createPopup('01KP3DPZ5286MMVVEZASP6024Z').open();
+    } else {
+      setTimeout(tryOpen, 200);
+    }
+  }
+  tryOpen();
+}
+
+// Always start at top on mobile
+window.scrollTo(0,0);
+document.documentElement.scrollTop=0;
+document.body.scrollTop=0;
+
+// Mark app as ready so future activateCard calls may scroll
+setTimeout(()=>{ window._appReady=true; },300);
+</script>
+
+</body>
+</html>
