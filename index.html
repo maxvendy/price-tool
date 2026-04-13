@@ -678,7 +678,7 @@ let _tfPopup = null;
 
 function initSurvey(){
   if(window.tf && window.tf.createPopup){
-    _tfPopup = window.tf.createPopup('Ngz2X2U6');
+    _tfPopup = window.tf.createPopup('Ngz2X2U6', {lazy: false});
   } else {
     setTimeout(initSurvey, 300);
   }
@@ -820,7 +820,7 @@ let _tfPopup = null;
 
 function initSurvey(){
   if(window.tf && window.tf.createPopup){
-    _tfPopup = window.tf.createPopup('Ngz2X2U6');
+    _tfPopup = window.tf.createPopup('Ngz2X2U6', {lazy: false});
   } else {
     setTimeout(initSurvey, 300);
   }
