@@ -252,8 +252,6 @@ select:focus { outline: none; border-color: var(--border-strong); }
   .price-mobile-cta-row { display: none; }
 }
 </style>
-  <link rel="stylesheet" href="https://embed.typeform.com/next/css/popup.css">
-  <script src="https://embed.typeform.com/next/embed.js"></script>
 </head>
 <body>
 
@@ -640,7 +638,6 @@ function showResult(lo,hi,sub){
   const ps=document.getElementById('price-sub');if(ps)ps.textContent=sub||'';
   const cta=document.getElementById('price-mobile-cta-row');if(cta)cta.classList.remove('hidden');
   show('result-wrap');
-  setTimeout(triggerSurvey, 3000);
 }
 
 function computeAndShow(){
@@ -672,27 +669,7 @@ function resetFrom(from){
 function selectBrand(b,el){
   clearBtns(el.parentElement);el.classList.add('sel');
   state.brand=b;doneCard('s-brand');
-  // ── Typeform survey ──
-let _surveyShown = false;
-let _tfPopup = null;
-
-function initSurvey(){
-  if(window.tf && window.tf.createPopup){
-    _tfPopup = window.tf.createPopup('Ngz2X2U6', {lazy: false});
-  } else {
-    setTimeout(initSurvey, 300);
-  }
-}
-
-function triggerSurvey(){
-  if(_surveyShown) return;
-  _surveyShown = true;
-  if(_tfPopup){
-    _tfPopup.open();
-  } else if(window.tf && window.tf.createPopup){
-    window.tf.createPopup('Ngz2X2U6').open();
-  }
-}
+  
 
 populateModels();show('s-model');activateCard('s-model');
   ['s-storage','s-screen','s-back','s-battery','s-condition','result-wrap'].forEach(hide);
@@ -814,40 +791,6 @@ function resetAll(){
 // Prevent browser from restoring scroll position
 if('scrollRestoration' in history) history.scrollRestoration='manual';
 
-// ── Typeform survey ──
-let _surveyShown = false;
-let _tfPopup = null;
-
-function initSurvey(){
-  if(window.tf && window.tf.createPopup){
-    _tfPopup = window.tf.createPopup('Ngz2X2U6', {lazy: false});
-  } else {
-    setTimeout(initSurvey, 300);
-  }
-}
-
-function triggerSurvey(){
-  if(_surveyShown) return;
-  _surveyShown = true;
-  if(_tfPopup){
-    _tfPopup.open();
-  } else if(window.tf && window.tf.createPopup){
-    window.tf.createPopup('Ngz2X2U6').open();
-  }
-}
-
-populateModels();show('s-model');activateCard('s-model');
-document.querySelector('#s-brand .opt-btn').classList.add('sel');
-
-
-// Always start at top on mobile
-window.scrollTo(0,0);
-document.documentElement.scrollTop=0;
-document.body.scrollTop=0;
-
-// Mark app as ready so future activateCard calls may scroll
-setTimeout(()=>{ window._appReady=true; },300);
-initSurvey();
 </script>
 
 </body>
