@@ -252,7 +252,6 @@ select:focus { outline: none; border-color: var(--border-strong); }
   .price-mobile-cta-row { display: none; }
 }
 </style>
-<script src="//embed.typeform.com/next/embed.js"></script>
 </head>
 <body>
 
@@ -625,7 +624,7 @@ function resetModelDisplay(){
 function fmt(n){
   const r=Math.round(n);
   if(r<60) return (Math.round(r/50)*50).toLocaleString('sv-SE');
-  if(r<100) return r.toLocaleString('sv-SE');
+  if(r<500) return r.toLocaleString('sv-SE');
   return (Math.ceil(r/100)*100).toLocaleString('sv-SE');
 }
 
@@ -670,7 +669,9 @@ function resetFrom(from){
 function selectBrand(b,el){
   clearBtns(el.parentElement);el.classList.add('sel');
   state.brand=b;doneCard('s-brand');
-  populateModels();show('s-model');activateCard('s-model');
+  
+
+populateModels();show('s-model');activateCard('s-model');
   ['s-storage','s-screen','s-back','s-battery','s-condition','result-wrap'].forEach(hide);
   resetFrom('model');
 }
@@ -790,28 +791,7 @@ function resetAll(){
 // Prevent browser from restoring scroll position
 if('scrollRestoration' in history) history.scrollRestoration='manual';
 
-populateModels();show('s-model');activateCard('s-model');
-document.querySelector('#s-brand .opt-btn').classList.add('sel');
-
-let surveyShown = false;
-function showTypeformPopup(){
-  if(surveyShown) return;
-  surveyShown = true;
-  const btn = document.getElementById('tf-popup-btn');
-  if(btn) btn.classList.add('visible');
-}
-
-// Always start at top on mobile
-window.scrollTo(0,0);
-document.documentElement.scrollTop=0;
-document.body.scrollTop=0;
-
-// Mark app as ready so future activateCard calls may scroll
-setTimeout(()=>{ window._appReady=true; },300);
 </script>
 
-<button class="tf-popup-btn" id="tf-popup-btn" data-tf-popup="01KP3DPZ5286MMVVEZASP6024Z" data-tf-opacity="100" data-tf-iframe-props="title=Vendy Survey" data-tf-transitive-search-params data-tf-medium="snippet">
-  💬 Snabb fråga för oss
-</button>
 </body>
 </html>
