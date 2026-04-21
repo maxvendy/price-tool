@@ -262,6 +262,47 @@ select:focus { outline: none; border-color: var(--border-strong); }
   font-size: 11px; color: #AEACA5;
   text-align: center; margin-top: 12px; line-height: 1.5;
 }
+.survey-gate {
+  position: fixed; inset: 0;
+  background: rgba(33,2,18,0.6);
+  z-index: 99998;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  opacity: 0; transition: opacity .3s ease;
+  pointer-events: none;
+}
+.survey-gate.visible { opacity: 1; pointer-events: auto; }
+.survey-card {
+  background: #fff; border-radius: 16px;
+  padding: 40px 32px 36px; max-width: 400px; width: 100%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  transform: translateY(12px); transition: transform .3s ease;
+  position: relative;
+}
+.survey-gate.visible .survey-card { transform: translateY(0); }
+.survey-close-btn {
+  position: absolute; top: 14px; right: 16px;
+  background: none; border: none; font-size: 20px;
+  cursor: pointer; color: #7A7870; line-height: 1; padding: 0;
+}
+.survey-close-btn:hover { color: #1A1916; }
+.survey-q {
+  font-family: "Be Vietnam Pro", sans-serif;
+  font-size: 17px; font-weight: 600; color: #1A1916;
+  margin-bottom: 20px; line-height: 1.4;
+}
+.survey-opts { display: flex; flex-direction: column; gap: 10px; }
+.survey-opt-btn {
+  padding: 12px 16px; border: 1.5px solid #E2E0DA; border-radius: 10px;
+  background: #fff; font-family: "Roboto", sans-serif; font-size: 14px;
+  color: #1A1916; cursor: pointer; text-align: left; transition: all .15s;
+}
+.survey-opt-btn:hover { border-color: #FF8E62; background: #FFF5F0; }
+.survey-thanks-msg {
+  text-align: center; padding: 12px 0;
+}
+.survey-thanks-msg .thanks-emoji { font-size: 36px; margin-bottom: 12px; }
+.survey-thanks-msg p { font-family: "Be Vietnam Pro", sans-serif; font-size: 16px; font-weight: 600; color: #1A1916; }
 .hidden { display: none !important; }
 
 @media (max-width: 700px) {
@@ -722,7 +763,7 @@ function submitEmail(){
     return;
   }
   const btn = document.getElementById('email-submit');
-  btn.textContent = 'Sparar...';
+  btn.textContent = 'Uppskattar värdet...';
   btn.disabled = true;
   // Send to Google Sheets
   const model = state.model || '';
@@ -756,6 +797,7 @@ function showResult(lo,hi,sub){
   const ps=document.getElementById('price-sub');if(ps)ps.textContent=sub||'';
   const cta=document.getElementById('price-mobile-cta-row');if(cta)cta.classList.remove('hidden');
   show('result-wrap');
+  setTimeout(showSurveyGate, 3000);
 }
 
 function computeAndShow(){
@@ -789,6 +831,53 @@ function selectBrand(b,el){
   state.brand=b;doneCard('s-brand');
   
 
+
+// ── Survey gate ──
+let _surveyQ1Answer = null;
+
+function showSurveyGate(){
+  document.getElementById('survey-gate').classList.add('visible');
+  document.getElementById('survey-q1').classList.remove('hidden');
+  document.getElementById('survey-q2').classList.add('hidden');
+  document.getElementById('survey-thanks').classList.add('hidden');
+  _surveyQ1Answer = null;
+}
+
+function closeSurveyGate(){
+  document.getElementById('survey-gate').classList.remove('visible');
+}
+
+function sendSurveyToSheet(q1, q2){
+  const email = document.getElementById('email-input') ? document.getElementById('email-input').value : '';
+  fetch('https://script.google.com/macros/s/AKfycby_j5o6qz_3Lt--Idmj5_NSr_BMo5uzfQZG1veUkm8YE-4ZrrKNysvTpZ2O7LT1H5zajw/exec', {
+    method: 'POST', mode: 'no-cors',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({email, survey_q1: q1, survey_q2: q2 || ''})
+  });
+}
+
+function answerQ1(answer){
+  _surveyQ1Answer = answer;
+  if(answer === 'Nej'){
+    document.getElementById('survey-q1').classList.add('hidden');
+    document.getElementById('survey-q2').classList.remove('hidden');
+  } else {
+    sendSurveyToSheet(answer, '');
+    showSurveyThanks();
+  }
+}
+
+function answerQ2(answer){
+  sendSurveyToSheet(_surveyQ1Answer, answer);
+  showSurveyThanks();
+}
+
+function showSurveyThanks(){
+  document.getElementById('survey-q2').classList.add('hidden');
+  document.getElementById('survey-q1').classList.add('hidden');
+  document.getElementById('survey-thanks').classList.remove('hidden');
+  setTimeout(closeSurveyGate, 2000);
+}
 
 populateModels();show('s-model');activateCard('s-model');
   ['s-storage','s-screen','s-back','s-battery','s-condition','result-wrap'].forEach(hide);
@@ -922,6 +1011,37 @@ if('scrollRestoration' in history) history.scrollRestoration='manual';
     <div class="email-error" id="email-error">Ange en giltig emailadress</div>
     <button class="email-submit" id="email-submit" onclick="submitEmail()" disabled>Visa mitt pris →</button>
     <div class="email-disclaimer">Genom att fortsätta godkänner du att Vendy sparar din email.</div>
+  </div>
+</div>
+
+<div class="survey-gate" id="survey-gate">
+  <div class="survey-card">
+    <button class="survey-close-btn" onclick="closeSurveyGate()">✕</button>
+
+    <!-- Q1 -->
+    <div id="survey-q1">
+      <div class="survey-q">Planerar du att sälja din telefon via en Vendy-kiosk?</div>
+      <div class="survey-opts">
+        <button class="survey-opt-btn" onclick="answerQ1('Ja, inom några dagar')">Ja, inom några dagar</button>
+        <button class="survey-opt-btn" onclick="answerQ1('Ja, men först om någon vecka')">Ja, men först om någon vecka</button>
+        <button class="survey-opt-btn" onclick="answerQ1('Nej')">Nej</button>
+      </div>
+    </div>
+
+    <!-- Q2 (only if Nej) -->
+    <div id="survey-q2" class="hidden">
+      <div class="survey-q">Varför kommer du inte sälja din mobil?</div>
+      <div class="survey-opts">
+        <button class="survey-opt-btn" onclick="answerQ2('Ingen mobil att sälja, bara nyfiken')">Jag har ingen mobil att sälja och var bara nyfiken på priset</button>
+        <button class="survey-opt-btn" onclick="answerQ2('Inte nöjd med priset')">Jag var inte nöjd med priset</button>
+      </div>
+    </div>
+
+    <!-- Thanks -->
+    <div id="survey-thanks" class="hidden survey-thanks-msg">
+      <div class="thanks-emoji">🙏</div>
+      <p>Tack för ditt svar!</p>
+    </div>
   </div>
 </div>
 </body>
