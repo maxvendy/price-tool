@@ -30,7 +30,7 @@
 body { font-family: 'Be Vietnam Pro', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding-top: env(safe-area-inset-top, 0px); }
 html { scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
 .outer { max-width: 980px; margin: 0 auto; padding: 24px 24px 80px; display: flex; gap: 32px; align-items: flex-start; }
-.sticky-price-col { width: 260px; flex-shrink: 0; position: sticky; top: 72px; }
+.sticky-price-col { width: 260px; flex-shrink: 0; position: sticky; top: 88px; }
 .form-col { flex: 1; min-width: 0; }
 .page { }
 
@@ -39,7 +39,7 @@ html { scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
 .sticky-top-bar { background: var(--bg); }
 
 /* Header */
-.header { margin-bottom: 20px; }
+.header { margin-bottom: 20px; margin-top: 32px; }
 .header-eyebrow { font-family: 'Be Vietnam Pro', sans-serif; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; }
 .header h1 { font-size: clamp(26px, 5vw, 38px); font-weight: 600; line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 10px; }
 
@@ -264,14 +264,14 @@ select:focus { outline: none; border-color: var(--border-strong); }
 .survey-thanks-msg p { font-family: "Be Vietnam Pro", sans-serif; font-size: 16px; font-weight: 600; color: #1A1916; }
 .topbar {
   position: sticky; top: 0; z-index: 10000;
-  background: #FF8E62; padding: 0 24px; height: 56px;
+  background: #FF8E62; padding: 0 32px; height: 72px;
   display: flex; align-items: center;
 }
 .topbar a { display: flex; align-items: center; text-decoration: none; }
 .topbar svg { width: 80px; height: auto; display: block; }
 .topbar svg path { fill: #fff !important; }
 @media (max-width: 700px) {
-  .topbar { height: 48px; padding: 0 16px; }
+  .topbar { height: 60px; padding: 0 20px; }
   .topbar svg { width: 70px; }
 }
 .hidden { display: none !important; }
