@@ -683,16 +683,12 @@ function updateProgress(){}
 function activateCard(id){
   const el=document.getElementById(id);
   el.classList.add('active');el.classList.remove('done');
-  if(window._appReady && window.innerWidth<=700){
+  if(window._appReady){
     setTimeout(()=>{
-      const y=el.getBoundingClientRect().top+window.scrollY-80;
-      window.scrollTo({top:y,behavior:'smooth'});
-    },80);
-  } else if(window.innerWidth>700){
-    setTimeout(()=>{
-      const y=el.getBoundingClientRect().top+window.scrollY-24;
-      window.scrollTo({top:y,behavior:'smooth'});
-    },80);
+      const offset = window.innerWidth<=700 ? 70 : 90;
+      const y = el.getBoundingClientRect().top + window.scrollY - offset;
+      window.scrollTo({top: Math.max(0, y), behavior:'smooth'});
+    },120);
   }
 }
 function doneCard(id){
