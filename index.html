@@ -848,12 +848,10 @@ function showResult(lo,hi,sub){
   const ps=document.getElementById('price-sub');if(ps)ps.textContent=sub||'';
   const cta=document.getElementById('price-mobile-cta-row');if(cta)cta.classList.remove('hidden');
   show('result-wrap');
-  // If email already captured, always insert new row but keep first rowKey for survey
-  if(window._emailCaptured){
+  // Insert new row only if this is NOT the first price (first is saved by submitEmail)
+  if(window._emailCaptured && window._firstPriceSaved){
     const email = document.getElementById('email-input') ? document.getElementById('email-input').value : '';
     if(email){
-      // Skip if this is the first price — already saved by submitEmail
-      if(!window._firstRowKey) { window._firstRowKey = window._sheetRowId; return; }
       const newRowKey = Date.now().toString();
       window._sheetRowId = newRowKey;
       fetch('https://script.google.com/macros/s/AKfycby_j5o6qz_3Lt--Idmj5_NSr_BMo5uzfQZG1veUkm8YE-4ZrrKNysvTpZ2O7LT1H5zajw/exec', {
@@ -863,6 +861,8 @@ function showResult(lo,hi,sub){
       }).catch(()=>{});
     }
   }
+  // Mark that the first price has now been shown
+  if(window._emailCaptured) window._firstPriceSaved = true;
   setTimeout(showSurveyGate, 3000);
 }
 
