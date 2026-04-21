@@ -852,7 +852,7 @@ function showResult(lo,hi,sub){
       fetch('https://script.google.com/macros/s/AKfycby_j5o6qz_3Lt--Idmj5_NSr_BMo5uzfQZG1veUkm8YE-4ZrrKNysvTpZ2O7LT1H5zajw/exec', {
         method: 'POST', mode: 'no-cors',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({email, model: window._currentModel, price: window._currentPrice, updated: true})
+        body: JSON.stringify({email, model: window._currentModel, price: window._currentPrice})
       });
     }
   }
