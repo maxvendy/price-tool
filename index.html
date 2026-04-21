@@ -743,10 +743,11 @@ function closeSurveyGate(){
 function sendSurveyToSheet(q1, q2){
   fetch('https://script.google.com/macros/s/AKfycby_j5o6qz_3Lt--Idmj5_NSr_BMo5uzfQZG1veUkm8YE-4ZrrKNysvTpZ2O7LT1H5zajw/exec', {
     method: 'POST',
+    mode: 'no-cors',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
       action: 'update',
-      rowId: window._sheetRowId,
+      rowKey: window._sheetRowId,
       survey_q1: q1,
       survey_q2: q2 || ''
     })
@@ -812,15 +813,15 @@ function submitEmail(){
   const model = state.model || '';
   const storage = state.storage || '';
   const price = _pendingResult ? (_pendingResult.hi ? _pendingResult.lo + ' - ' + _pendingResult.hi : _pendingResult.lo) + ' kr' : '';
+  // Generate a unique session ID to link email row with survey update
+  window._sheetRowId = Date.now().toString();
+  const insertData = {action: 'insert', rowKey: window._sheetRowId, email, model: window._currentModel || model + ' ' + storage, price};
   fetch('https://script.google.com/macros/s/AKfycby_j5o6qz_3Lt--Idmj5_NSr_BMo5uzfQZG1veUkm8YE-4ZrrKNysvTpZ2O7LT1H5zajw/exec', {
     method: 'POST',
+    mode: 'no-cors',
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({action: 'insert', email, model: window._currentModel || model + ' ' + storage, price})
-  })
-  .then(r => r.json())
-  .then(data => { window._sheetRowId = data.rowId; })
-  .catch(() => {})
-  .finally(()=>{
+    body: JSON.stringify(insertData)
+  }).finally(()=>{
     window._emailCaptured = true;
     document.getElementById('email-gate').classList.remove('visible');
     if(_pendingResult) showResult(_pendingResult.lo, _pendingResult.hi, _pendingResult.sub);
@@ -850,14 +851,13 @@ function showResult(lo,hi,sub){
   if(window._emailCaptured){
     const email = document.getElementById('email-input') ? document.getElementById('email-input').value : '';
     if(email){
+      window._sheetRowId = Date.now().toString();
       fetch('https://script.google.com/macros/s/AKfycby_j5o6qz_3Lt--Idmj5_NSr_BMo5uzfQZG1veUkm8YE-4ZrrKNysvTpZ2O7LT1H5zajw/exec', {
         method: 'POST',
+        mode: 'no-cors',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({action: 'insert', email, model: window._currentModel || '', price: window._currentPrice || ''})
-      })
-      .then(r => r.json())
-      .then(data => { window._sheetRowId = data.rowId; })
-      .catch(() => {});
+        body: JSON.stringify({action: 'insert', rowKey: window._sheetRowId, email, model: window._currentModel || '', price: window._currentPrice || ''})
+      }).catch(() => {});
     }
   }
   setTimeout(showSurveyGate, 3000);
