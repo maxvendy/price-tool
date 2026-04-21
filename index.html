@@ -27,9 +27,9 @@
   --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Be Vietnam Pro', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+body { font-family: 'Be Vietnam Pro', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding-top: env(safe-area-inset-top, 0px); }
 html { scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
-.outer { max-width: 980px; margin: 0 auto; padding: 36px 24px 80px; display: flex; gap: 32px; align-items: flex-start; }
+.outer { max-width: 980px; margin: 0 auto; padding: 24px 24px 80px; display: flex; gap: 32px; align-items: flex-start; }
 .sticky-price-col { width: 260px; flex-shrink: 0; position: sticky; top: 24px; }
 .form-col { flex: 1; min-width: 0; }
 .page { }
@@ -367,8 +367,8 @@ select:focus { outline: none; border-color: var(--border-strong); }
 
 
 
-  <!-- Step 1: Brand -->
-  <div class="card active" id="s-brand">
+  <!-- Step 1: Brand (hidden - Apple preselected) -->
+  <div class="card done" id="s-brand">
     <div class="step-meta"><span class="step-num">01</span><span class="step-title">Välj märke</span></div>
     <div class="btn-grid" style="align-items:flex-start">
       <button class="opt-btn sel" onclick="selectBrand('Apple',this)">Apple</button>
@@ -836,7 +836,7 @@ function showResult(lo,hi,sub){
       }
     }
   }
-  setTimeout(showSurveyGate, 3000);
+  setTimeout(showSurveyGate, 6000);
 }
 
 function computeAndShow(){
@@ -979,7 +979,7 @@ function resetAll(){
   document.querySelectorAll('.phone-card').forEach(c=>c.classList.remove('sel-ok','sel-broken'));
   document.getElementById('sel-model').value='';
   document.getElementById('storage-opts').innerHTML='';
-  document.getElementById('s-brand').classList.add('active');
+  state.brand = 'Apple';
   document.querySelector('#s-brand .opt-btn').classList.add('sel');
   document.getElementById('batt-tip-content').classList.add('hidden');
   document.querySelector('.batt-tip-toggle').textContent='Hur kollar jag min batterihälsa? →';
@@ -991,6 +991,18 @@ function resetAll(){
 
 // Prevent browser from restoring scroll position
 if('scrollRestoration' in history) history.scrollRestoration='manual';
+
+populateModels();
+state.brand = 'Apple';
+doneCard('s-brand');
+show('s-model');
+document.getElementById('s-model').classList.add('active');
+document.querySelector('#s-brand .opt-btn').classList.add('sel');
+
+// Always start at top on mobile
+window.scrollTo(0,0);
+document.documentElement.scrollTop=0;
+document.body.scrollTop=0;
 
 </script>
 
