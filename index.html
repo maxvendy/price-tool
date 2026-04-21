@@ -28,7 +28,8 @@
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Be Vietnam Pro', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
-html { scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+html { scroll-behavior: smooth; -webkit-overflow-scrolling: touch; overflow-x: hidden; }
+body { overflow-x: hidden; }
 .outer { max-width: 980px; margin: 0 auto; padding: 36px 24px 80px; display: flex; gap: 32px; align-items: flex-start; }
 .sticky-price-col { width: 260px; flex-shrink: 0; position: sticky; top: 72px; }
 .form-col { flex: 1; min-width: 0; }
@@ -167,42 +168,15 @@ select:focus { outline: none; border-color: var(--border-strong); }
   .topbar { height: 48px; padding: 0 16px; }
   .topbar svg { width: 70px; }
 }
-.topbar{position:sticky;top:0;z-index:10000;background:#FF8E62;padding:0 24px;height:56px;display:flex;align-items:center;}
-.topbar a{display:flex;align-items:center;text-decoration:none;}
-.topbar svg{width:80px;height:auto;display:block;}
-.topbar svg path{fill:#fff !important;} .topbar svg rect{fill:#fff !important;stroke:#fff !important;}
-@media(max-width:700px){.topbar{height:48px;padding:0 16px;}.topbar svg{width:70px;}}
-.tf-popup-btn {
-  position: fixed;
-  bottom: -100px;
-  right: 24px;
-  z-index: 99999;
-  background: #210212;
-  color: #fff;
-  border: none;
-  border-radius: 50px;
-  padding: 14px 22px;
-  font-family: 'Be Vietnam Pro', sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-  transition: bottom .4s cubic-bezier(.4,0,.2,1), opacity .3s;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.tf-popup-btn.visible { bottom: 24px; }
-@media (max-width: 700px) {
-  .tf-popup-btn { bottom: -100px; right: 16px; left: 16px; justify-content: center; border-radius: 12px; }
-  .tf-popup-btn.visible { bottom: 110px; }
-}
+
+
 .email-gate {
-  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  position: fixed; top: 0; left: 0;
+  width: 100vw; height: 100vh;
   background: rgba(33,2,18,0.6);
   z-index: 99999;
   display: flex; align-items: center; justify-content: center;
-  padding: 20px;
+  box-sizing: border-box; padding: 20px;
   opacity: 0; transition: opacity .3s ease;
   pointer-events: none;
 }
@@ -263,11 +237,12 @@ select:focus { outline: none; border-color: var(--border-strong); }
   text-align: center; margin-top: 12px; line-height: 1.5;
 }
 .survey-gate {
-  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  position: fixed; top: 0; left: 0;
+  width: 100vw; height: 100vh;
   background: rgba(33,2,18,0.6);
   z-index: 99998;
   display: flex; align-items: center; justify-content: center;
-  padding: 20px;
+  box-sizing: border-box; padding: 20px;
   opacity: 0; transition: opacity .3s ease;
   pointer-events: none;
 }
@@ -354,16 +329,13 @@ select:focus { outline: none; border-color: var(--border-strong); }
 
   /* Popups on mobile */
   .email-gate,
-  .survey-gate {
-    padding: 16px;
-    align-items: center;
-  }
+  .survey-gate { padding: 16px; }
   .email-card,
   .survey-card {
-    width: 100%;
-    max-width: 100%;
+    width: calc(100vw - 32px);
+    max-width: calc(100vw - 32px);
     border-radius: 16px;
-    padding: 32px 20px 28px;
+    padding: 28px 20px 24px;
     max-height: 85vh;
     overflow-y: auto;
   }
