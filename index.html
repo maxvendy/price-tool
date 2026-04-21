@@ -685,7 +685,7 @@ function activateCard(id){
   el.classList.add('active');el.classList.remove('done');
   setTimeout(()=>{
     const topbarH = window.innerWidth<=700 ? 56 : 72;
-    const y = el.getBoundingClientRect().top + window.scrollY - topbarH - 12;
+    const y = el.getBoundingClientRect().top + window.scrollY - topbarH - 8;
     window.scrollTo({top: Math.max(0, y), behavior:'smooth'});
   }, 100);
 }
