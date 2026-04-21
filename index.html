@@ -815,6 +815,7 @@ function submitEmail(){
   const price = _pendingResult ? (_pendingResult.hi ? _pendingResult.lo + ' - ' + _pendingResult.hi : _pendingResult.lo) + ' kr' : '';
   // Generate a unique session ID to link email row with survey update
   window._sheetRowId = Date.now().toString();
+  window._firstRowKey = window._sheetRowId; // Survey always updates this first row
   const insertData = {action: 'insert', rowKey: window._sheetRowId, email, model: window._currentModel || model + ' ' + storage, price};
   fetch('https://script.google.com/macros/s/AKfycby_j5o6qz_3Lt--Idmj5_NSr_BMo5uzfQZG1veUkm8YE-4ZrrKNysvTpZ2O7LT1H5zajw/exec', {
     method: 'POST',
@@ -853,7 +854,7 @@ function showResult(lo,hi,sub){
     if(email){
       const newRowKey = Date.now().toString();
       // Keep the first rowKey of the session for survey linking
-      if(!window._firstRowKey) window._firstRowKey = newRowKey;
+      // _firstRowKey is set in submitEmail — never overwrite it here
       window._sheetRowId = newRowKey;
       fetch('https://script.google.com/macros/s/AKfycby_j5o6qz_3Lt--Idmj5_NSr_BMo5uzfQZG1veUkm8YE-4ZrrKNysvTpZ2O7LT1H5zajw/exec', {
         method: 'POST', mode: 'no-cors',
