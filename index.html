@@ -353,6 +353,22 @@ select:focus { outline: none; border-color: var(--border-strong); }
   .top-disclaimer { margin-bottom: 20px; font-size: 12px; }
   .sticky-top-bar { background: var(--bg); }
   .result-wrap { margin-top: 0; }
+
+  /* Popups on mobile */
+  .email-gate,
+  .survey-gate {
+    padding: 16px;
+    align-items: flex-end;
+  }
+  .email-card,
+  .survey-card {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 20px 20px 16px 16px;
+    padding: 32px 24px 28px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
 }
 @media (min-width: 701px) {
   .price-mobile-left { display: contents; }
@@ -739,13 +755,17 @@ function fmt(n){
 // ── Survey gate ──
 let _surveyQ1Answer = null;
 
+let _surveyShownOnce = false;
 function showSurveyGate(){
+  if(_surveyShownOnce) return;
+  _surveyShownOnce = true;
   document.getElementById('survey-gate').classList.add('visible');
   document.getElementById('survey-q1').classList.remove('hidden');
   document.getElementById('survey-q2').classList.add('hidden');
   document.getElementById('survey-thanks').classList.add('hidden');
   document.body.style.overflow = 'hidden';
   _surveyQ1Answer = null;
+  _surveyShownOnce = false;
 }
 
 function closeSurveyGate(){
