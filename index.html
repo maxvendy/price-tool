@@ -267,7 +267,7 @@ select:focus { outline: none; border-color: var(--border-strong); }
 @media (max-width: 700px) {
   /* ── Layout ── */
   .outer { display: block; padding: 0; }
-  .sticky-price-col { position: static !important; width: 100%; z-index: auto; margin-bottom: 16px; }
+  .sticky-price-col { position: sticky !important; top: 0; width: 100%; z-index: 100; margin-bottom: 16px; }
   .form-col { padding: 0 16px 40px; }
 
   /* ── Desktop price box → hidden, replaced by bottom bar ── */
@@ -663,7 +663,8 @@ function activateCard(id){
   el.classList.add('active');el.classList.remove('done');
   setTimeout(()=>{
     const topbarH = window.innerWidth<=700 ? 16 : 24;
-    const y = el.getBoundingClientRect().top + window.scrollY - topbarH - 8;
+    const scrollOffset = window.innerWidth<=700 ? 120 : topbarH + 8;
+    const y = el.getBoundingClientRect().top + window.scrollY - scrollOffset;
     window.scrollTo({top: Math.max(0, y), behavior:'smooth'});
   }, 100);
 }
