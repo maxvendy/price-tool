@@ -28,8 +28,8 @@
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Be Vietnam Pro', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
-html { scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
-body { overflow-x: clip; }
+html { scroll-behavior: smooth; -webkit-overflow-scrolling: touch; overflow-x: hidden; }
+body { }
 .outer { max-width: 980px; margin: 0 auto; padding: 36px 24px 80px; display: flex; gap: 32px; align-items: flex-start; }
 .sticky-price-col { width: 260px; flex-shrink: 0; position: sticky; top: 72px; }
 .form-col { flex: 1; min-width: 0; }
@@ -684,16 +684,16 @@ function updateProgress(){}
 function activateCard(id){
   const el=document.getElementById(id);
   el.classList.add('active');el.classList.remove('done');
-  // On mobile, only scroll when navigating forward (not on init)
   if(window._appReady && window.innerWidth<=700){
     setTimeout(()=>{
-      const y=el.getBoundingClientRect().top+window.scrollY-80;
-      window.scrollTo({top:y,behavior:'smooth'});
-    },80);
+      // Offset: topbar (48px) + small padding
+      const y=el.getBoundingClientRect().top+window.scrollY-64;
+      window.scrollTo({top:Math.max(0,y),behavior:'smooth'});
+    },100);
   } else if(window.innerWidth>700){
     setTimeout(()=>{
       const y=el.getBoundingClientRect().top+window.scrollY-24;
-      window.scrollTo({top:y,behavior:'smooth'});
+      window.scrollTo({top:Math.max(0,y),behavior:'smooth'});
     },80);
   }
 }
