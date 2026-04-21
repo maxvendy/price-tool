@@ -28,8 +28,8 @@
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Be Vietnam Pro', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
-html { scroll-behavior: smooth; -webkit-overflow-scrolling: touch; overflow-x: hidden; }
-body { overflow-x: hidden; }
+html { scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+body { overflow-x: clip; }
 .outer { max-width: 980px; margin: 0 auto; padding: 36px 24px 80px; display: flex; gap: 32px; align-items: flex-start; }
 .sticky-price-col { width: 260px; flex-shrink: 0; position: sticky; top: 72px; }
 .form-col { flex: 1; min-width: 0; }
@@ -824,6 +824,7 @@ function submitEmail(){
     body: JSON.stringify(insertData)
   }).finally(()=>{
     window._emailCaptured = true;
+    window._skipNextInsert = true; // submitEmail already saved this row
     document.getElementById('email-gate').classList.remove('visible');
     if(_pendingResult) showResult(_pendingResult.lo, _pendingResult.hi, _pendingResult.sub);
     _pendingResult = null;
@@ -848,21 +849,23 @@ function showResult(lo,hi,sub){
   const ps=document.getElementById('price-sub');if(ps)ps.textContent=sub||'';
   const cta=document.getElementById('price-mobile-cta-row');if(cta)cta.classList.remove('hidden');
   show('result-wrap');
-  // Insert new row only if this is NOT the first price (first is saved by submitEmail)
-  if(window._emailCaptured && window._firstPriceSaved){
-    const email = document.getElementById('email-input') ? document.getElementById('email-input').value : '';
-    if(email){
-      const newRowKey = Date.now().toString();
-      window._sheetRowId = newRowKey;
-      fetch('https://script.google.com/macros/s/AKfycby_j5o6qz_3Lt--Idmj5_NSr_BMo5uzfQZG1veUkm8YE-4ZrrKNysvTpZ2O7LT1H5zajw/exec', {
-        method: 'POST', mode: 'no-cors',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({action: 'insert', rowKey: newRowKey, email, model: window._currentModel||'', price: window._currentPrice||''})
-      }).catch(()=>{});
+  // Insert new row — skip if submitEmail just saved this row
+  if(window._emailCaptured){
+    if(window._skipNextInsert){
+      window._skipNextInsert = false; // consume the skip flag
+    } else {
+      const email = document.getElementById('email-input') ? document.getElementById('email-input').value : '';
+      if(email){
+        const newRowKey = Date.now().toString();
+        window._sheetRowId = newRowKey;
+        fetch('https://script.google.com/macros/s/AKfycby_j5o6qz_3Lt--Idmj5_NSr_BMo5uzfQZG1veUkm8YE-4ZrrKNysvTpZ2O7LT1H5zajw/exec', {
+          method: 'POST', mode: 'no-cors',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({action: 'insert', rowKey: newRowKey, email, model: window._currentModel||'', price: window._currentPrice||''})
+        }).catch(()=>{});
+      }
     }
   }
-  // Mark that the first price has now been shown
-  if(window._emailCaptured) window._firstPriceSaved = true;
   setTimeout(showSurveyGate, 3000);
 }
 
