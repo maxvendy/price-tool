@@ -747,7 +747,7 @@ function sendSurveyToSheet(q1, q2){
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
       action: 'update',
-      rowKey: window._sheetRowId,
+      rowKey: window._firstRowKey || window._sheetRowId,
       survey_q1: q1,
       survey_q2: q2 || ''
     })
@@ -847,17 +847,19 @@ function showResult(lo,hi,sub){
   const ps=document.getElementById('price-sub');if(ps)ps.textContent=sub||'';
   const cta=document.getElementById('price-mobile-cta-row');if(cta)cta.classList.remove('hidden');
   show('result-wrap');
-  // If email already captured, insert a new row for this new price
+  // If email already captured, always insert new row but keep first rowKey for survey
   if(window._emailCaptured){
     const email = document.getElementById('email-input') ? document.getElementById('email-input').value : '';
     if(email){
-      window._sheetRowId = Date.now().toString();
+      const newRowKey = Date.now().toString();
+      // Keep the first rowKey of the session for survey linking
+      if(!window._firstRowKey) window._firstRowKey = newRowKey;
+      window._sheetRowId = newRowKey;
       fetch('https://script.google.com/macros/s/AKfycby_j5o6qz_3Lt--Idmj5_NSr_BMo5uzfQZG1veUkm8YE-4ZrrKNysvTpZ2O7LT1H5zajw/exec', {
-        method: 'POST',
-        mode: 'no-cors',
+        method: 'POST', mode: 'no-cors',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({action: 'insert', rowKey: window._sheetRowId, email, model: window._currentModel || '', price: window._currentPrice || ''})
-      }).catch(() => {});
+        body: JSON.stringify({action: 'insert', rowKey: newRowKey, email, model: window._currentModel||'', price: window._currentPrice||''})
+      }).catch(()=>{});
     }
   }
   setTimeout(showSurveyGate, 3000);
