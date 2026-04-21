@@ -852,9 +852,9 @@ function showResult(lo,hi,sub){
   if(window._emailCaptured){
     const email = document.getElementById('email-input') ? document.getElementById('email-input').value : '';
     if(email){
+      // Skip if this is the first price — already saved by submitEmail
+      if(!window._firstRowKey) { window._firstRowKey = window._sheetRowId; return; }
       const newRowKey = Date.now().toString();
-      // Keep the first rowKey of the session for survey linking
-      // _firstRowKey is set in submitEmail — never overwrite it here
       window._sheetRowId = newRowKey;
       fetch('https://script.google.com/macros/s/AKfycby_j5o6qz_3Lt--Idmj5_NSr_BMo5uzfQZG1veUkm8YE-4ZrrKNysvTpZ2O7LT1H5zajw/exec', {
         method: 'POST', mode: 'no-cors',
