@@ -1063,6 +1063,11 @@ async function loadPrices(){
     // gviz wraps JSON in google.visualization.Query.setResponse(...) — extract the JSON body
     const json=JSON.parse(text.substring(text.indexOf('{'),text.lastIndexOf('}')+1));
     const rows=(json.table&&json.table.rows)||[];
+    // Locate the broken-screen/back columns by header label (sheet has an
+    // empty spacer column before them), fall back to positions J and I
+    const cols=(json.table&&json.table.cols)||[];
+    const findCol=(re,def)=>{const i=cols.findIndex(c=>re.test(c.label||''));return i>=0?i:def};
+    const SCREEN_COL=findCol(/screen/i,9),BACK_COL=findCol(/back/i,8);
     const parsed=[];
     rows.forEach(r=>{
       const c=r.c||[];
@@ -1072,7 +1077,7 @@ async function loadPrices(){
       const asNew=num(2),vGood=num(3),good=num(4),heavy=num(5);
       // Skips the header row (non-numeric prices) and blank/incomplete rows
       if(model==null||storage==null||asNew==null||vGood==null||good==null||heavy==null)return;
-      const battDed=num(6)||0,brokenScreen=num(7)||0,brokenBack=num(8)||0;
+      const battDed=num(6)||0,brokenScreen=num(SCREEN_COL)||0,brokenBack=num(BACK_COL)||0;
       const minPrice=Math.min(asNew,vGood,good,heavy);
       parsed.push([String(model),String(storage),asNew,vGood,good,heavy,battDed,brokenScreen,brokenBack,minPrice]);
     });
