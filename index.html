@@ -551,7 +551,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </div><!-- /outer -->
 
 <script>
-const PRICES=[
+// Hardcoded fallback prices — used if fetching from Google Sheets fails
+let PRICES=[
 ["iPhone 11 Pro Max","256G",1490,1420,1270,1200,320,100,100,1200],
 ["iPhone 11 Pro Max","512G",1560,1490,1340,1260,320,100,100,1260],
 ["iPhone 11 Pro Max","64G",1350,1280,1150,1090,320,100,100,1090],
@@ -1028,17 +1029,61 @@ function resetAll(){
 // Prevent browser from restoring scroll position
 if('scrollRestoration' in history) history.scrollRestoration='manual';
 
-populateModels();
-state.brand = 'Apple';
-doneCard('s-brand');
-show('s-model');
-document.getElementById('s-model').classList.add('active');
-document.querySelector('#s-brand .opt-btn').classList.add('sel');
+function initApp(){
+  populateModels();
+  state.brand = 'Apple';
+  doneCard('s-brand');
+  show('s-model');
+  document.getElementById('s-model').classList.add('active');
+  document.getElementById('sel-model').disabled=false;
+  document.querySelector('#s-brand .opt-btn').classList.add('sel');
 
-// Always start at top on mobile
-window.scrollTo(0,0);
-document.documentElement.scrollTop=0;
-document.body.scrollTop=0;
+  // Always start at top on mobile
+  window.scrollTo(0,0);
+  document.documentElement.scrollTop=0;
+  document.body.scrollTop=0;
+}
+
+// ── Fetch prices from Google Sheets, fall back silently to hardcoded PRICES ──
+const PRICE_SHEET_URL='https://docs.google.com/spreadsheets/d/1JTbBGylYIHSUBrZBh8scW48QSQNW4YxK06mv7nXQ9jc/gviz/tq?tqx=out:json&sheet=Sheet1';
+
+function showPricesLoading(){
+  const sel=document.getElementById('sel-model');
+  sel.disabled=true;
+  sel.innerHTML='<option value="">Laddar priser…</option>';
+  show('s-model');
+}
+
+async function loadPrices(){
+  showPricesLoading();
+  try{
+    const res=await fetch(PRICE_SHEET_URL);
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const text=await res.text();
+    // gviz wraps JSON in google.visualization.Query.setResponse(...) — extract the JSON body
+    const json=JSON.parse(text.substring(text.indexOf('{'),text.lastIndexOf('}')+1));
+    const rows=(json.table&&json.table.rows)||[];
+    const parsed=[];
+    rows.forEach(r=>{
+      const c=r.c||[];
+      const val=i=>(c[i]&&c[i].v!=null)?c[i].v:null;
+      const num=i=>{const v=val(i);const n=typeof v==='number'?v:parseFloat(v);return isFinite(n)?n:null};
+      const model=val(0),storage=val(1);
+      const asNew=num(2),vGood=num(3),good=num(4),heavy=num(5);
+      // Skips the header row (non-numeric prices) and blank/incomplete rows
+      if(model==null||storage==null||asNew==null||vGood==null||good==null||heavy==null)return;
+      const battDed=num(6)||0,brokenScreen=num(7)||0,brokenBack=num(8)||0;
+      const minPrice=Math.min(asNew,vGood,good,heavy);
+      parsed.push([String(model),String(storage),asNew,vGood,good,heavy,battDed,brokenScreen,brokenBack,minPrice]);
+    });
+    if(parsed.length>0)PRICES=parsed;
+  }catch(e){
+    // Silent fallback — hardcoded PRICES stays in place so the tool always works
+  }
+  initApp();
+}
+
+loadPrices();
 
 </script>
 
