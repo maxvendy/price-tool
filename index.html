@@ -717,10 +717,7 @@ function resetModelDisplay(){
 }
 
 function fmt(n){
-  const r=Math.round(n);
-  if(r<60) return (Math.round(r/50)*50).toLocaleString('sv-SE');
-  if(r<500) return r.toLocaleString('sv-SE');
-  return (Math.ceil(r/100)*100).toLocaleString('sv-SE');
+  return Math.round(n).toLocaleString('sv-SE');
 }
 
 // ── Survey gate ──
@@ -888,7 +885,7 @@ function computeAndShow(){
   if(state.back==='broken'){showResult(fmt(brokenBack),null,'Baserat på trasig baksida / ram');return;}
   if(!state.condition)return;
   const battLow=state.battery!==null&&state.battery<85;
-  const applyB=v=>battLow&&battDed>0?Math.max(v-battDed,minPrice):Math.max(v,minPrice);
+  const applyB=v=>battLow&&battDed>0?Math.max(v-battDed,0):v;
   const lo=applyB(heavy);
   const hi=applyB(asNew);
   const sub=battLow?'Prisintervall, batteriavdrag tillämpat':'Uppskattat prisintervall';
